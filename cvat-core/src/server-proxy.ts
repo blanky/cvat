@@ -1339,7 +1339,7 @@ class ServerProxy {
             return response.data;
         }
 
-        async function getData(tid, jid, chunk) {
+        async function getData(tid, jid, chunk, original) {
             const { backendAPI } = config;
 
             const url = jid === null ? `tasks/${tid}/data` : `jobs/${jid}/data`;
@@ -1349,7 +1349,7 @@ class ServerProxy {
                 response = await workerAxios.get(`${backendAPI}/${url}`, {
                     params: {
                         ...enableOrganization(),
-                        quality: 'compressed',
+                        quality: original ? 'original' : 'compressed',
                         type: 'chunk',
                         number: chunk,
                     },

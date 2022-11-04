@@ -706,7 +706,7 @@ export function changeFrameAsync(
                 return;
             }
 
-            const data = await job.frames.get(toFrame, fillBuffer, frameStep);
+            const data = await job.frames.get(toFrame, fillBuffer, frameStep, state.settings.player.showOriginalImage);
             const states = await job.annotations.get(toFrame, showAllInterpolationTracks, filters);
 
             if (!isAbleToChangeFrame()) {

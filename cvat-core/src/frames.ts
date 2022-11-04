@@ -29,6 +29,7 @@
             stopFrame,
             decodeForward,
             deleted,
+            downloadOriginal=false,
             has_related_context: hasRelatedContext,
         }) {
             Object.defineProperties(
@@ -141,6 +142,18 @@
                         value: deleted,
                         writable: false,
                     },
+                    /**
+                     * True if frame downloaded is from original data
+                     * @name downloadOriginal
+                     * @type {boolean}
+                     * @memberof module:API.cvat.classes.FrameData
+                     * @readonly
+                     * @instance
+                     */
+                     downloadOriginal: {
+                        value: downloadOriginal,
+                        writable: false,
+                    },
                 }),
             );
         }
@@ -228,7 +241,7 @@
                 const taskDataCache = frameDataCache[this.jid];
                 const activeChunk = taskDataCache.activeChunkRequest;
                 activeChunk.request = serverProxy.frames
-                    .getData(null, this.jid, activeChunk.chunkNumber)
+                    .getData(null, this.jid, activeChunk.chunkNumber, this.downloadOriginal)
                     .then((chunk) => {
                         frameDataCache[this.jid].activeChunkRequest.completed = true;
                         if (!taskDataCache.nextChunkRequest) {
@@ -562,7 +575,7 @@
             }
         }
 
-        async require(frameNumber, jobID, fillBuffer, frameStep) {
+        async require(frameNumber, jobID, fillBuffer, frameStep, downloadOriginal) {
             for (const frame in this._buffer) {
                 if (+frame < frameNumber || +frame >= frameNumber + this._size * frameStep) {
                     delete this._buffer[frame];
@@ -579,6 +592,7 @@
                 stopFrame: frameDataCache[jobID].stopFrame,
                 decodeForward: !fillBuffer,
                 deleted: frameNumber in frameDataCache[jobID].meta.deleted_frames,
+                downloadOriginal: downloadOriginal,
             });
 
             if (frameNumber in this._buffer) {
@@ -695,6 +709,7 @@
         isPlaying,
         step,
         dimension,
+        downloadOriginal=false,
     ) {
         if (!(jobID in frameDataCache)) {
             const blockType = chunkType === 'video' ? cvatData.BlockType.MP4VIDEO : cvatData.BlockType.ARCHIVE;
@@ -738,7 +753,7 @@
             frameDataCache[jobID].provider.setRenderSize(frameMeta.width, frameMeta.height);
         }
 
-        return frameDataCache[jobID].frameBuffer.require(frame, jobID, isPlaying, step);
+        return frameDataCache[jobID].frameBuffer.require(frame, jobID, isPlaying, step, downloadOriginal);
     }
 
     async function getDeletedFrames(instanceType, id) {

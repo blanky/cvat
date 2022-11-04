@@ -767,6 +767,7 @@ export interface PlayerSettingsState {
     rotateAll: boolean;
     smoothImage: boolean;
     showDeletedFrames: boolean;
+    showOriginalImage: boolean;
     grid: boolean;
     gridSize: number;
     gridColor: GridColor;

@@ -191,13 +191,14 @@ function buildDuplicatedAPI(prototype) {
         }),
         frames: Object.freeze({
             value: {
-                async get(frame, isPlaying = false, step = 1) {
+                async get(frame, isPlaying = false, step = 1, original = false) {
                     const result = await PluginRegistry.apiWrapper.call(
                         this,
                         prototype.frames.get,
                         frame,
                         isPlaying,
                         step,
+                        original,
                     );
                     return result;
                 },
@@ -1993,7 +1994,7 @@ buildDuplicatedAPI(Task.prototype);
         return new Issue(result);
     };
 
-    Job.prototype.frames.get.implementation = async function (frame, isPlaying, step) {
+    Job.prototype.frames.get.implementation = async function (frame, isPlaying, step, original=false) {
         if (!Number.isInteger(frame) || frame < 0) {
             throw new ArgumentError(`Frame must be a positive integer. Got: "${frame}"`);
         }
@@ -2013,6 +2014,7 @@ buildDuplicatedAPI(Task.prototype);
             isPlaying,
             step,
             this.dimension,
+            original,
         );
         return frameData;
     };
@@ -2435,7 +2437,7 @@ buildDuplicatedAPI(Task.prototype);
         return result;
     };
 
-    Task.prototype.frames.get.implementation = async function (frame, isPlaying, step) {
+    Task.prototype.frames.get.implementation = async function (frame, isPlaying, step, original=false) {
         if (!Number.isInteger(frame) || frame < 0) {
             throw new ArgumentError(`Frame must be a positive integer. Got: "${frame}"`);
         }
@@ -2456,6 +2458,7 @@ buildDuplicatedAPI(Task.prototype);
             job.stopFrame,
             isPlaying,
             step,
+            original,
         );
         return result;
     };
